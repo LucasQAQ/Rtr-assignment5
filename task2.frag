@@ -351,25 +351,26 @@ bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tma
 bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
                       out float t, out vec3 hitPos, out vec3 hitNormal )
 {
-    vec3 minBound = cube.center - (cube.size / 2.0);
-    vec3 maxBound = cube.center + (cube.size / 2.0);
-
+    vec3 minBound = cube.center - (cube.size / 2.0); // Compute the minimum boundaries of the cube.
+    vec3 maxBound = cube.center + (cube.size / 2.0); // Compute the maximum boundaries of the cube.
+    // Compute the intersection of ray and planes of cube
     vec3 t1 = (minBound - ray.o) / ray.d;
     vec3 t2 = (maxBound - ray.o) / ray.d;
-    
-    vec3 tsmall = min(t1, t2);
-    vec3 tbig = max(t1, t2);
-    
-    float tstart = max(max(tsmall.x, tsmall.y), max(tsmall.y, tsmall.z));
-    float tend = min(min(tbig.x, tbig.y), min(tbig.y, tbig.z));
-    
+    // Compute the smallest and largest t that intersects the cube
+    vec3 t3 = min(t1, t2);
+    vec3 t4 = max(t1, t2);
+    // Compute entry and exit points.
+    float tstart = max(max(t3.x, t3.y), max(t3.y, t3.z));
+    float tend = min(min(t4.x, t4.y), min(t4.y, t4.z));
     if(tend < tstart || tstart > tmax || tend < tmin)
         return false;
         
     t = tstart < tmin ? tend : tstart;
+    // Compute the hit position
     hitPos = ray.o + ray.d * t;
+    // Compute the length between the cube center and the hit position.
     vec3 d = abs(hitPos - cube.center) / (cube.size / 2.0);
-    float maxD = max(max(d.x, d.y), d.z);
+    float maxD = max(max(d.x, d.y), d.z); // Maximum dimension
 
     if(maxD == d.x)
         hitNormal = vec3(sign(hitPos.x - cube.center.x), 0.0, 0.0);
@@ -391,11 +392,11 @@ bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax)
     vec3 t1 = (minBound - ray.o) / ray.d;
     vec3 t2 = (maxBound - ray.o) / ray.d;
     
-    vec3 tsmall = min(t1, t2);
-    vec3 tbig = max(t1, t2);
+    vec3 t3 = min(t1, t2);
+    vec3 t4 = max(t1, t2);
     
-    float tstart = max(max(tsmall.x, tsmall.y), max(tsmall.y, tsmall.z));
-    float tend = min(min(tbig.x, tbig.y), min(tbig.y, tbig.z));
+    float tstart = max(max(t3.x, t3.y), max(t3.y, t3.z));
+    float tend = min(min(t4.x, t4.y), min(t4.y, t4.z));
     
     if(tend < tstart || tstart > tmax || tend < tmin)
         return false;
