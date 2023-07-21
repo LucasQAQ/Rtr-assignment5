@@ -22,6 +22,7 @@ const int NUM_ITERATIONS = 2;
 const int NUM_LIGHTS = 2;
 const int NUM_MATERIALS = 9;
 const int NUM_SPHERES = 22;
+const int NUM_CUBES = 1;
 
 
 //============================================================================
@@ -44,6 +45,14 @@ struct Sphere_t {
     int materialID;
 };
 
+
+struct Cube_t {
+    vec3 center;
+    int materialID;
+    vec3 size;
+};
+
+
 struct Light_t {
     vec3 position;  // Point light 3D position.
     vec3 I_a;       // For Ambient.
@@ -64,6 +73,7 @@ struct Material_t {
 
 Plane_t Table;
 Sphere_t Sphere[NUM_SPHERES];
+Cube_t Cube[NUM_CUBES];
 Light_t Light[NUM_LIGHTS];
 Material_t Material[NUM_MATERIALS];
 
@@ -148,6 +158,11 @@ void InitScene() {
     Sphere[21].center = vec3(3.0, 0.5, 4.5);
     Sphere[21].radius = 0.5;
     Sphere[21].materialID = 7;
+    
+    //cube1
+    Cube[0].center = vec3(0.0, 0.5, -10.0);
+    Cube[0].size = vec3(50.0, 10.0, 1.0);
+    Cube[0].materialID = 7;
     
     // Black Plastic Material
     Material[0].k_d = vec3(0.0, 0.0, 0.0);
@@ -364,6 +379,60 @@ bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tma
     }
 }
 
+bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
+                      out float t, out vec3 hitPos, out vec3 hitNormal )
+{
+    vec3 minBound = cube.center - (cube.size / 2.0);
+    vec3 maxBound = cube.center + (cube.size / 2.0);
+
+    vec3 t1 = (minBound - ray.o) / ray.d;
+    vec3 t2 = (maxBound - ray.o) / ray.d;
+    
+    vec3 tsmall = min(t1, t2);
+    vec3 tbig = max(t1, t2);
+    
+    float tstart = max(max(tsmall.x, tsmall.y), max(tsmall.y, tsmall.z));
+    float tend = min(min(tbig.x, tbig.y), min(tbig.y, tbig.z));
+    
+    if(tend < tstart || tstart > tmax || tend < tmin)
+        return false;
+        
+    t = tstart < tmin ? tend : tstart;
+
+    hitPos = ray.o + ray.d * t;
+    vec3 d = abs(hitPos - cube.center) - (cube.size / 2.0);
+
+    if(d.x > d.y && d.x > d.z)
+        hitNormal = vec3(sign(ray.d.x), 0.0, 0.0);
+    else if(d.y > d.x && d.y > d.z)
+        hitNormal = vec3(0.0, sign(ray.d.y), 0.0);
+    else
+        hitNormal = vec3(0.0, 0.0, sign(ray.d.z));
+
+    return true;
+}
+
+bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax)
+{
+    vec3 minBound = cube.center - (cube.size / 2.0);
+    vec3 maxBound = cube.center + (cube.size / 2.0);
+
+    vec3 t1 = (minBound - ray.o) / ray.d;
+    vec3 t2 = (maxBound - ray.o) / ray.d;
+    
+    vec3 tsmall = min(t1, t2);
+    vec3 tbig = max(t1, t2);
+    
+    float tstart = max(max(tsmall.x, tsmall.y), max(tsmall.y, tsmall.z));
+    float tend = min(min(tbig.x, tbig.y), min(tbig.y, tbig.z));
+    
+    if(tend < tstart || tstart > tmax || tend < tmin)
+        return false;
+
+    return true;
+
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Computes (I_a * k_a) + k_shadow * I_source * [ k_d * (N.L) + k_r * (R.V)^n ].
 // Input vectors L, N and V are pointing AWAY from surface point.
@@ -439,6 +508,16 @@ vec3 CastRay( in Ray_t ray,
             }
         }
     }
+     for (int i = 0; i < NUM_CUBES; i++) {
+        if(IntersectCube( Cube[i], ray, DEFAULT_TMIN, DEFAULT_TMAX,
+                      temp_t, temp_hitPos, temp_hitNormal ) && temp_t < nearest_t) {
+                         hasHitSomething = true;
+                         nearest_t = temp_t;
+                         nearest_hitPos = temp_hitPos;
+                         nearest_hitNormal = temp_hitNormal;
+                         nearest_hitMatID = Cube[i].materialID;
+                      }
+    }
 
 
     // One of the output results.
@@ -458,6 +537,13 @@ vec3 CastRay( in Ray_t ray,
         for (int j = 0; j < NUM_SPHERES; j++) {
             if (IntersectSphere(Sphere[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o)) == true) {
                 inShadow = true;
+            }
+        }
+        for (int j = 0; j < NUM_CUBES; j++) {
+            bool inShadow = IntersectCube( Cube[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o));
+            if(inShadow) {
+                inShadow = true;
+                break;
             }
         }
         I_local += PhongLighting(shadowRay.d, nearest_hitNormal, -ray.d, inShadow, Material[nearest_hitMatID], Light[i]);
@@ -537,8 +623,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 pixel_pos = (2.0 * fragCoord.xy - iResolution.xy) / iResolution.y;
 
     // Position the camera.
-    vec3 cam_pos = vec3( Sphere[21].center.x - 7.0, 5.0, Sphere[21].center.z + 7.0 );
-    vec3 cam_lookat = vec3( 18.0, 0.5, -9.0 );
+    vec3 cam_pos = vec3( Sphere[21].center.x - 20.0, 10.0, Sphere[21].center.z + 15.0 );
+    vec3 cam_lookat = Sphere[21].center;
     vec3 cam_up_vec = vec3( 0.0, 1.0, 0.0 );
 
     // Set up camera coordinate frame in world space.
