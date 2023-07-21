@@ -1,5 +1,19 @@
 //============================================================================
-// Constants.
+// PROJECT ID: SWS3005_12
+//
+// GROUP NUMBER: 12
+//
+// STUDENT NAME: HU ZHANPENG
+// NUS User ID.: t0930152
+//
+// STUDENT NAME: NING JUNTING
+// NUS User ID.: t0930085
+//
+// STUDENT NAME: LUO TANGWEN
+// NUS User ID.: t0930258
+//
+// COMMENTS TO GRADER:
+//
 //============================================================================
 const float PI = 3.1415926536;
 
@@ -288,57 +302,27 @@ bool IntersectPlane( in Plane_t pln, in Ray_t ray, in float tmin, in float tmax 
 bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tmax,
                       out float t, out vec3 hitPos, out vec3 hitNormal )
 {
-    vec3 translateRay = ray.o;
-    translateRay -= sph.center;
-    float a = 1.0;
-    float b = 2.0 * dot(ray.d, translateRay);
-    float c = dot(translateRay, translateRay) - sph.radius * sph.radius;
-    float d = b * b - 4.0 * a * c;
-    if (d == 0.0) {
-        float t0 = - b / (2.0 * a);
-        if ( t0 < tmin || t0 > tmax ) return false;
-        t = t0;
-        hitPos = ray.o + t * ray.d;
-        hitNormal = normalize(translateRay + t * ray.d);
-        return true;
-    }
-    if (d < 0.0) {
-        return false;
-    }
-    if (d > 0.0) {
-        float t1 = (-b + sqrt(d)) / (2.0 * a);
-        float t2 = (-b - sqrt(d)) / (2.0 * a);
-        bool flag1 = true;
-        bool flag2 = true;
-        if ( t1 < tmin || t1 > tmax ){
-            flag1 = false;
-        }
-        if ( t2 < tmin || t2 > tmax ){
-            flag2 = false;
-        }
-        if (flag1 == false && flag2 == false) {
-            return false;
-        }
-        if (flag1 == false && flag2 == true) {
-            t = t2;
-            hitPos = ray.o + t * ray.d;
-            hitNormal = normalize(translateRay + t * ray.d);
-            return true;
-        }
-        if (flag1 == true && flag2 == false) {
-            t = t1;
-            hitPos = ray.o + t * ray.d;
-            hitNormal = normalize(translateRay + t * ray.d);
-            return true;
-        }
-        if (flag1 == true && flag2 == true) {
-            t = min(t1, t2);
-            hitPos = ray.o + t * ray.d;
-            hitNormal = normalize(translateRay + t * ray.d);
-            return true;
-        }
-    }
+    /////////////////////////////////
+    // TASK: WRITE YOUR CODE HERE. //
+    /////////////////////////////////
+    float a = dot(ray.d, ray.d);
+    float b = 2.0 * dot(ray.o - sph.center, ray.d);
+    float c = dot(ray.o - sph.center, ray.o - sph.center) - sph.radius * sph.radius;
+    float det_square = b * b - 4.0 * a * c;
+    if (det_square < 0.0) return false;
+    float det = sqrt(det_square);
+    float t1 = (-b - det) / (2.0 * a);
+    float t2 = (-b + det) / (2.0 * a);
+    
+    if (tmin <= t1 && t1 <= tmax) t = t1;
+    else if (tmin <= t2 && t2 <= tmax) t = t2;
+    else return false;
+    hitPos = ray.o + t * ray.d;
+    hitNormal = normalize(hitPos - sph.center);
+    return true;
 }
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Computes intersection between a sphere and a ray.
@@ -347,36 +331,21 @@ bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tma
 /////////////////////////////////////////////////////////////////////////////
 bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tmax )
 {
-    vec3 translateRay = ray.o;
-    translateRay -= sph.center;
-    float a = 1.0;
-    float b = 2.0 * dot(ray.d, translateRay);
-    float c = dot(translateRay, translateRay) - sph.radius * sph.radius;
-    float d = b * b - 4.0 * a * c;
-    if (d == 0.0) {
-        float t0 = - b / (2.0 * a);
-        if ( t0 < tmin || t0 > tmax ) return false;
-        return true;
-    }
-    if (d < 0.0) {
-        return false;
-    }
-    if (d > 0.0) {
-        float t1 = (-b + sqrt(d)) / (2.0 * a);
-        float t2 = (-b - sqrt(d)) / (2.0 * a);
-        bool flag1 = true;
-        bool flag2 = true;
-        if ( t1 < tmin || t1 > tmax ){
-            flag1 = false;
-        }
-        if ( t2 < tmin || t2 > tmax ){
-            flag2 = false;
-        }
-        if (flag1 == false && flag2 == false) {
-            return false;
-        }
-        return true;
-    }
+    /////////////////////////////////
+    // TASK: WRITE YOUR CODE HERE. //
+    /////////////////////////////////
+    float a = dot(ray.d, ray.d);
+    float b = 2.0 * dot(ray.o - sph.center, ray.d);
+    float c = dot(ray.o - sph.center, ray.o - sph.center) - sph.radius * sph.radius;
+    float det_square = b * b - 4.0 * a * c;
+    if (det_square < 0.0) return false;
+    float det = sqrt(det_square);
+    float t1 = (-b - det) / (2.0 * a);
+    float t2 = (-b + det) / (2.0 * a);
+    if (tmin <= t1 && t1 <= tmax) return true;
+    else if (tmin <= t2 && t2 <= tmax) return true;
+    else return false;
+
 }
 
 bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
@@ -508,7 +477,7 @@ vec3 CastRay( in Ray_t ray,
             }
         }
     }
-     for (int i = 0; i < NUM_CUBES; i++) {
+    for (int i = 0; i < NUM_CUBES; i++) {
         if(IntersectCube( Cube[i], ray, DEFAULT_TMIN, DEFAULT_TMAX,
                       temp_t, temp_hitPos, temp_hitNormal ) && temp_t < nearest_t) {
                          hasHitSomething = true;
