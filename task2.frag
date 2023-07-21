@@ -161,8 +161,8 @@ void InitScene() {
     
     //cube1
     Cube[0].center = vec3(0.0, 0.5, -10.0);
-    Cube[0].size = vec3(50.0, 10.0, 1.0);
-    Cube[0].materialID = 7;
+    Cube[0].size = vec3(50.0, 1.0, 1.0);
+    Cube[0].materialID = 5;
     
     // Black Plastic Material
     Material[0].k_d = vec3(0.0, 0.0, 0.0);
@@ -398,19 +398,21 @@ bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
         return false;
         
     t = tstart < tmin ? tend : tstart;
-
     hitPos = ray.o + ray.d * t;
-    vec3 d = abs(hitPos - cube.center) - (cube.size / 2.0);
+    vec3 d = abs(hitPos - cube.center) / (cube.size / 2.0);
+    float maxD = max(max(d.x, d.y), d.z);
 
-    if(d.x > d.y && d.x > d.z)
-        hitNormal = vec3(sign(ray.d.x), 0.0, 0.0);
-    else if(d.y > d.x && d.y > d.z)
-        hitNormal = vec3(0.0, sign(ray.d.y), 0.0);
+    if(maxD == d.x)
+        hitNormal = vec3(sign(hitPos.x - cube.center.x), 0.0, 0.0);
+    else if(maxD == d.y)
+        hitNormal = vec3(0.0, sign(hitPos.y - cube.center.y), 0.0);
     else
-        hitNormal = vec3(0.0, 0.0, sign(ray.d.z));
+        hitNormal = vec3(0.0, 0.0, sign(hitPos.z - cube.center.z));
+    hitNormal = normalize(hitNormal);
 
     return true;
 }
+
 
 bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax)
 {
