@@ -15,6 +15,10 @@
 // COMMENTS TO GRADER:
 //
 //============================================================================
+
+//============================================================================
+// Constants.
+//============================================================================
 const float PI = 3.1415926536;
 
 const vec3 BACKGROUND_COLOR = vec3( 0.1, 0.2, 0.6 );
@@ -33,10 +37,11 @@ const float DEFAULT_TMAX = 10.0e6;
 const int NUM_ITERATIONS = 2;
 
 // Constants for the scene objects.
-const int NUM_LIGHTS = 2;
-const int NUM_MATERIALS = 9;
+const int NUM_LIGHTS = 3;
+const int NUM_MATERIALS = 11;
 const int NUM_SPHERES = 22;
-const int NUM_CUBES = 1;
+const int NUM_CUBES = 7;
+const int NUM_PLANES = 5;
 
 
 //============================================================================
@@ -59,13 +64,11 @@ struct Sphere_t {
     int materialID;
 };
 
-
 struct Cube_t {
     vec3 center;
-    int materialID;
     vec3 size;
+    int materialID;
 };
-
 
 struct Light_t {
     vec3 position;  // Point light 3D position.
@@ -85,23 +88,86 @@ struct Material_t {
 // Global scene data.
 //============================================================================
 
-Plane_t Table;
+Plane_t Plane[NUM_PLANES];
 Sphere_t Sphere[NUM_SPHERES];
-Cube_t Cube[NUM_CUBES];
 Light_t Light[NUM_LIGHTS];
 Material_t Material[NUM_MATERIALS];
+Cube_t Cube[NUM_CUBES];
 
 /////////////////////////////////////////////////////////////////////////////
 // Initializes the scene.
 /////////////////////////////////////////////////////////////////////////////
 
 void InitScene() {
-    // Snooker Table Plane
-    Table.A = 0.0;
-    Table.B = 1.0;
-    Table.C = 0.0;
-    Table.D = 0.0;
-    Table.materialID = 8;
+    // Bottom Plane
+    Plane[0].A = 0.0;
+    Plane[0].B = 1.0;
+    Plane[0].C = 0.0;
+    Plane[0].D = 10.0;
+    Plane[0].materialID = 10;
+    
+    // Left Plane
+    Plane[1].A = 1.0;
+    Plane[1].B = 0.0;
+    Plane[1].C = 0.0;
+    Plane[1].D = 30.0;
+    Plane[1].materialID = 10;
+    
+    // Right Plane
+    Plane[2].A = 1.0;
+    Plane[2].B = 0.0;
+    Plane[2].C = 0.0;
+    Plane[2].D = -30.0;
+    Plane[2].materialID = 10;
+    
+    // Front Plane
+    Plane[3].A = 0.0;
+    Plane[3].B = 0.0;
+    Plane[3].C = 1.0;
+    Plane[3].D = -20.0;
+    Plane[3].materialID = 10;
+    
+    // Back Plane
+    Plane[4].A = 0.0;
+    Plane[4].B = 0.0;
+    Plane[4].C = 1.0;
+    Plane[4].D = 20.0;
+    Plane[4].materialID = 10;
+    
+    // Back Left Baffle
+    Cube[0].center = vec3(-8.75, 0.5, -9.5);
+    Cube[0].size = vec3(16.3, 1.0, 1.0);
+    Cube[0].materialID = 9;
+    
+    // Back Right Baffle
+    Cube[1].center = vec3(8.75, 0.5, -9.5);
+    Cube[1].size = vec3(16.3, 1.0, 1.0);
+    Cube[1].materialID = 9;
+    
+    // Front Left Baffle
+    Cube[2].center = vec3(-8.75, 0.5, 9.5);
+    Cube[2].size = vec3(16.3, 1.0, 1.0);
+    Cube[2].materialID = 9;
+    
+    // Front Right Baffle
+    Cube[3].center = vec3(8.75, 0.5, 9.5);
+    Cube[3].size = vec3(16.3, 1.0, 1.0);
+    Cube[3].materialID = 9;
+    
+    // Left Baffle
+    Cube[4].center = vec3(-18.5, 0.5, 0.0);
+    Cube[4].size = vec3(1.0, 1.0, 15.8);
+    Cube[4].materialID = 9;
+    
+    // Right Baffle
+    Cube[5].center = vec3(18.5, 0.5, 0.0);
+    Cube[5].size = vec3(1.0, 1.0, 15.8);
+    Cube[5].materialID = 9;
+    
+    // Table Plane
+    Cube[6].center = vec3(0.0, -0.05, 0.0);
+    Cube[6].size = vec3(38.0, 0.1, 20.0);
+    Cube[6].materialID = 8;
     
     // Black Ball
     Sphere[0].center = vec3(-15.0, 0.5, 0.0);
@@ -169,14 +235,9 @@ void InitScene() {
     Sphere[20].materialID = 6;
     
     // White Ball
-    Sphere[21].center = vec3(3.0, 0.5, 4.5);
+    Sphere[21].center = vec3(-5.0, 0.5, 4.5);
     Sphere[21].radius = 0.5;
     Sphere[21].materialID = 7;
-    
-    //cube1
-    Cube[0].center = vec3(0.0, 0.5, -10.0);
-    Cube[0].size = vec3(50.0, 1.0, 1.0);
-    Cube[0].materialID = 5;
     
     // Black Plastic Material
     Material[0].k_d = vec3(0.0, 0.0, 0.0);
@@ -236,10 +297,24 @@ void InitScene() {
     
     // Table Material
     Material[8].k_d = vec3(0.42, 0.56, 0.14);
-    Material[8].k_a = 0.2 * Material[7].k_d;
+    Material[8].k_a = 0.2 * Material[8].k_d;
     Material[8].k_r = vec3(1.0, 1.0, 1.0);
-    Material[8].k_rg = 0.5 * Material[7].k_r;
+    Material[8].k_rg = 0.5 * Material[8].k_r;
     Material[8].n = 128.0;
+    
+    // Baffle Material
+    Material[9].k_d = vec3(0.18, 0.17, 0.23);
+    Material[9].k_a = vec3(0.05, 0.05, 0.07);
+    Material[9].k_r = vec3(0.33, 0.33, 0.35);
+    Material[9].k_rg = 0.5 * Material[9].k_r;
+    Material[9].n = 38.4;
+    
+    // Room material.
+    Material[10].k_d = vec3( 0.5, 0.5, 0.5 );
+    Material[10].k_a = 0.2 * Material[10].k_d;
+    Material[10].k_r = 2.0 * Material[10].k_d;
+    Material[10].k_rg = 0.5 * Material[10].k_r;
+    Material[10].n = 64.0;
     
     // Light 0
     Light[0].position = vec3(9.0 * cos(iTime), 15.0, 9.0 * sin(iTime));
@@ -247,9 +322,14 @@ void InitScene() {
     Light[0].I_source = vec3(1.0, 1.0, 1.0);
     
     // Light 1
-    Light[1].position = vec3(-18.0, 15.0, -9.0);
+    Light[1].position = vec3(-29.0, 12.0, 19.0);
     Light[1].I_a = vec3(0.1, 0.1, 0.1);
     Light[1].I_source = vec3(1.0, 1.0, 1.0);
+    
+    // Light 2
+    Light[2].position = vec3(29.0, 12.0, -19.0);
+    Light[2].I_a = vec3(0.1, 0.1, 0.1);
+    Light[2].I_source = vec3(1.0, 1.0, 1.0);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -302,27 +382,57 @@ bool IntersectPlane( in Plane_t pln, in Ray_t ray, in float tmin, in float tmax 
 bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tmax,
                       out float t, out vec3 hitPos, out vec3 hitNormal )
 {
-    /////////////////////////////////
-    // TASK: WRITE YOUR CODE HERE. //
-    /////////////////////////////////
-    float a = dot(ray.d, ray.d);
-    float b = 2.0 * dot(ray.o - sph.center, ray.d);
-    float c = dot(ray.o - sph.center, ray.o - sph.center) - sph.radius * sph.radius;
-    float det_square = b * b - 4.0 * a * c;
-    if (det_square < 0.0) return false;
-    float det = sqrt(det_square);
-    float t1 = (-b - det) / (2.0 * a);
-    float t2 = (-b + det) / (2.0 * a);
-    
-    if (tmin <= t1 && t1 <= tmax) t = t1;
-    else if (tmin <= t2 && t2 <= tmax) t = t2;
-    else return false;
-    hitPos = ray.o + t * ray.d;
-    hitNormal = normalize(hitPos - sph.center);
-    return true;
+    vec3 translateRay = ray.o;
+    translateRay -= sph.center;
+    float a = 1.0;
+    float b = 2.0 * dot(ray.d, translateRay);
+    float c = dot(translateRay, translateRay) - sph.radius * sph.radius;
+    float d = b * b - 4.0 * a * c;
+    if (d == 0.0) {
+        float t0 = - b / (2.0 * a);
+        if ( t0 < tmin || t0 > tmax ) return false;
+        t = t0;
+        hitPos = ray.o + t * ray.d;
+        hitNormal = normalize(translateRay + t * ray.d);
+        return true;
+    }
+    if (d < 0.0) {
+        return false;
+    }
+    if (d > 0.0) {
+        float t1 = (-b + sqrt(d)) / (2.0 * a);
+        float t2 = (-b - sqrt(d)) / (2.0 * a);
+        bool flag1 = true;
+        bool flag2 = true;
+        if ( t1 < tmin || t1 > tmax ){
+            flag1 = false;
+        }
+        if ( t2 < tmin || t2 > tmax ){
+            flag2 = false;
+        }
+        if (flag1 == false && flag2 == false) {
+            return false;
+        }
+        if (flag1 == false && flag2 == true) {
+            t = t2;
+            hitPos = ray.o + t * ray.d;
+            hitNormal = normalize(translateRay + t * ray.d);
+            return true;
+        }
+        if (flag1 == true && flag2 == false) {
+            t = t1;
+            hitPos = ray.o + t * ray.d;
+            hitNormal = normalize(translateRay + t * ray.d);
+            return true;
+        }
+        if (flag1 == true && flag2 == true) {
+            t = min(t1, t2);
+            hitPos = ray.o + t * ray.d;
+            hitNormal = normalize(translateRay + t * ray.d);
+            return true;
+        }
+    }
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Computes intersection between a sphere and a ray.
@@ -331,21 +441,36 @@ bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tma
 /////////////////////////////////////////////////////////////////////////////
 bool IntersectSphere( in Sphere_t sph, in Ray_t ray, in float tmin, in float tmax )
 {
-    /////////////////////////////////
-    // TASK: WRITE YOUR CODE HERE. //
-    /////////////////////////////////
-    float a = dot(ray.d, ray.d);
-    float b = 2.0 * dot(ray.o - sph.center, ray.d);
-    float c = dot(ray.o - sph.center, ray.o - sph.center) - sph.radius * sph.radius;
-    float det_square = b * b - 4.0 * a * c;
-    if (det_square < 0.0) return false;
-    float det = sqrt(det_square);
-    float t1 = (-b - det) / (2.0 * a);
-    float t2 = (-b + det) / (2.0 * a);
-    if (tmin <= t1 && t1 <= tmax) return true;
-    else if (tmin <= t2 && t2 <= tmax) return true;
-    else return false;
-
+    vec3 translateRay = ray.o;
+    translateRay -= sph.center;
+    float a = 1.0;
+    float b = 2.0 * dot(ray.d, translateRay);
+    float c = dot(translateRay, translateRay) - sph.radius * sph.radius;
+    float d = b * b - 4.0 * a * c;
+    if (d == 0.0) {
+        float t0 = - b / (2.0 * a);
+        if ( t0 < tmin || t0 > tmax ) return false;
+        return true;
+    }
+    if (d < 0.0) {
+        return false;
+    }
+    if (d > 0.0) {
+        float t1 = (-b + sqrt(d)) / (2.0 * a);
+        float t2 = (-b - sqrt(d)) / (2.0 * a);
+        bool flag1 = true;
+        bool flag2 = true;
+        if ( t1 < tmin || t1 > tmax ){
+            flag1 = false;
+        }
+        if ( t2 < tmin || t2 > tmax ){
+            flag2 = false;
+        }
+        if (flag1 == false && flag2 == false) {
+            return false;
+        }
+        return true;
+    }
 }
 
 bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
@@ -457,15 +582,28 @@ vec3 CastRay( in Ray_t ray,
     vec3 temp_hitNormal;
     bool temp_hasHit;
     
-
-    if (IntersectPlane(Table, ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
-        temp_hasHit = true;
-        if (temp_t < nearest_t) {
-            nearest_t = temp_t;
-            nearest_hitPos = temp_hitPos;
-            nearest_hitNormal = temp_hitNormal;
-            nearest_hitMatID = Table.materialID;
-            hasHitSomething = temp_hasHit;
+    for (int i = 0; i < NUM_PLANES; i++) {
+        if (IntersectPlane(Plane[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
+            temp_hasHit = true;
+            if (temp_t < nearest_t) {
+                nearest_t = temp_t;
+                nearest_hitPos = temp_hitPos;
+                nearest_hitNormal = temp_hitNormal;
+                nearest_hitMatID = Plane[i].materialID;
+                hasHitSomething = temp_hasHit;
+            }
+        }
+    }
+    for (int i = 0; i < NUM_CUBES; i++) {
+        if (IntersectCube(Cube[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
+            temp_hasHit = true;
+            if (temp_t < nearest_t) {
+                nearest_t = temp_t;
+                nearest_hitPos = temp_hitPos;
+                nearest_hitNormal = temp_hitNormal;
+                nearest_hitMatID = Cube[i].materialID;
+                hasHitSomething = temp_hasHit;
+            }
         }
     }
     for (int i = 0; i < NUM_SPHERES; i++) {
@@ -480,16 +618,6 @@ vec3 CastRay( in Ray_t ray,
             }
         }
     }
-    for (int i = 0; i < NUM_CUBES; i++) {
-        if(IntersectCube( Cube[i], ray, DEFAULT_TMIN, DEFAULT_TMAX,
-                      temp_t, temp_hitPos, temp_hitNormal ) && temp_t < nearest_t) {
-                         hasHitSomething = true;
-                         nearest_t = temp_t;
-                         nearest_hitPos = temp_hitPos;
-                         nearest_hitNormal = temp_hitNormal;
-                         nearest_hitMatID = Cube[i].materialID;
-                      }
-    }
 
 
     // One of the output results.
@@ -503,8 +631,10 @@ vec3 CastRay( in Ray_t ray,
         Ray_t shadowRay;
         shadowRay.o = nearest_hitPos;
         shadowRay.d = normalize(Light[i].position - shadowRay.o);
-        if (IntersectPlane(Table, shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o)) == true) {
-            inShadow = true;
+        for (int j = 0; j < NUM_PLANES; j++) {
+            if (IntersectPlane(Plane[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o)) == true) {
+                inShadow = true;
+            }
         }
         for (int j = 0; j < NUM_SPHERES; j++) {
             if (IntersectSphere(Sphere[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o)) == true) {
@@ -512,10 +642,8 @@ vec3 CastRay( in Ray_t ray,
             }
         }
         for (int j = 0; j < NUM_CUBES; j++) {
-            bool inShadow = IntersectCube( Cube[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o));
-            if(inShadow) {
+            if (IntersectCube(Cube[j], shadowRay, DEFAULT_TMIN, length(Light[i].position - shadowRay.o)) == true) {
                 inShadow = true;
-                break;
             }
         }
         I_local += PhongLighting(shadowRay.d, nearest_hitNormal, -ray.d, inShadow, Material[nearest_hitMatID], Light[i]);
@@ -597,6 +725,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     // Position the camera.
     vec3 cam_pos = vec3( Sphere[21].center.x - 20.0, 10.0, Sphere[21].center.z + 15.0 );
     vec3 cam_lookat = Sphere[21].center;
+    //vec3 cam_pos = vec3( 11.0, 3.0, -4.0 );
+    //vec3 cam_lookat = vec3( 15.0, 1.0, -9.0 );
     vec3 cam_up_vec = vec3( 0.0, 1.0, 0.0 );
 
     // Set up camera coordinate frame in world space.
