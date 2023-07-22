@@ -100,10 +100,8 @@ struct Cube_t {
 
 
 struct Light_t {
-    mat4 worldMat;
-    vec2 size;
+    vec3 position;
     vec3 E;
-    vec3 normal;
 };
 //============================================================================
 // Global scene data.
@@ -273,30 +271,15 @@ void InitCube() {
 
 void InitLight() {
     // Light 0
-    Light[0].worldMat = mat4(1, 0, 0, 0,
-                             0, 1, 0, 0,
-                             0, 0, 1, 0,
-                             0, 5, 0, 1);
-    Light[0].size = vec2(20);
+    Light[0].position = vec3(0, 5, 0);
     Light[0].E = vec3(1, 1, 1) * vec3(300);
-    Light[0].normal = vec3(0, -1 ,0);
     
     // Light 1
-    Light[1].worldMat = mat4(1, 0, 0, 0,
-                             0, 1, 0, 0,
-                             0, 0, 1, 0,
-                             0, 100, 0, 1);
-    Light[1].size = vec2(20);
+    Light[1].position = vec3(0, 100, 0);
     Light[1].E = vec3(1, 1, 1) * vec3(500);
-    Light[1].normal = normalize(vec3(0, -1, -1));
     // Light 2
-    Light[2].worldMat = mat4(1, 0, 0, 0,
-                             0, 1, 0, 0,
-                             0, 0, 1, 0,
-                             0, 20, -20, 1);
-    Light[2].size = vec2(2);
+    Light[2].position = vec3(0, 20, -20);
     Light[2].E = vec3(1, 1, 1) * vec3(100);
-    Light[2].normal = normalize(vec3(0, -1, 1));
 
 
 }
@@ -493,16 +476,6 @@ mat3 formBasis(vec3 n) {
     return m;
 }
 
-// --SAMPLING------------------------------------------------------------------
-vec3 sampleLight(int i) {
-    Light_t light = Light[i];
-    mat4 S = mat4(light.size.x, 0, 0, 0,
-                  0, light.size.y, 0, 0,
-                  0,            0, 1, 0,
-                  0,            0, 0, 1);
-    mat4 M = light.worldMat * S;
-    return vec3((M * vec4(0, 0, 0, 1)).xyz);
-}
 
 // --SHADING-------------------------------------------------------------------
 // Lambert diffuse term
@@ -838,9 +811,7 @@ vec3 Whitted_Raytracing() {
 
         // Sample lights
         for (int i = 0; i < NUM_LIGHTS; i++) {
-            // Generate point on light surface
-            vec3 ls = sampleLight(i);
-            vec3 lightPos = ls.xyz;
+            vec3 lightPos = Light[i].position;
 
             // Generate shadow ray
             Ray_t sray;
@@ -853,10 +824,9 @@ vec3 Whitted_Raytracing() {
             if (!sHit.hit) {
                 // Add light contribution when visible
                 float rSquare = sray.t * sray.t;
-                if (dot(Light[i].normal, -sray.d) > 0.0) {
-                    vec3 E = Light[i].E;
-                    result += throughput * evalBRDF(hit.normal, -pRay.d, sray.d, m) * E / rSquare;
-                }
+                vec3 E = Light[i].E;
+                result += throughput * evalBRDF(hit.normal, -pRay.d, sray.d, m) * E / rSquare;
+                
             }
         }
 
