@@ -276,10 +276,10 @@ void InitLight() {
     
     // Light 1
     Light[1].position = vec3(0, 100, 0);
-    Light[1].E = vec3(1, 1, 1) * vec3(500);
+    Light[1].E = vec3(1, 1, 1) * vec3(50000);
     // Light 2
-    Light[2].position = vec3(0, 20, -20);
-    Light[2].E = vec3(1, 1, 1) * vec3(100);
+    Light[2].position = vec3(-15, 5, 0);
+    Light[2].E = vec3(1, 1, 1) * vec3(300);
 
 
 }
