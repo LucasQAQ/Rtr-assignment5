@@ -15,7 +15,7 @@
 // COMMENTS TO GRADER:
 //
 //============================================================================
-const int SAMPLES_PER_PIXEL = 200;
+const int SAMPLES_PER_PIXEL = 10;
 const float PI = 3.1415926536;
 const int BOUNCES = 3;
 const float P_TERMINATE = 0.75;
@@ -46,7 +46,7 @@ const float DEFAULT_TMAX = 10.0e6;
 
 // Constants for the scene objects.
 const int NUM_LIGHTS = 3;
-const int NUM_MATERIALS = 11;
+const int NUM_MATERIALS = 12;
 const int NUM_SPHERES = 22;
 const int NUM_CUBES = 7;
 const int NUM_PLANES = 5;
@@ -345,12 +345,12 @@ void InitMaterial() {
     Material[7].metalness = 0.8;
     Material[7].emission = vec3(0.0);
     // Table Material
-    Material[8].albedo = vec3(0.42, 0.56, 0.14);
+    Material[8].albedo = vec3(0.02, 0.36, 0.04);
     Material[8].roughness = 0.8;
     Material[8].metalness = 0.5;
     Material[8].emission = vec3(0.0);
     // Baffle Material
-    Material[9].albedo = vec3(0.18, 0.17, 0.23);
+    Material[9].albedo = vec3(0.2, 0.05, 0.04);
     Material[9].roughness = 1.0;
     Material[9].metalness = 0.2;
     Material[9].emission = vec3(0.0);
@@ -358,12 +358,74 @@ void InitMaterial() {
     Material[10].albedo = vec3(1, 1, 1);
     Material[10].roughness = 0.3;
     Material[10].metalness = 1.0;
-    Material[10].emission = vec3(0.4);
-}
-/////////////////////////////////////////////////////////////////////////////
-// Initializes the scene.
-/////////////////////////////////////////////////////////////////////////////
+    Material[10].emission = vec3(0.0);
+    // NUS Material
+    Material[11].albedo = vec3(0.0, 0.0, 0.6);
+    Material[11].roughness = 0.8;
+    Material[11].metalness = 0.2;
+    Material[11].emission = vec3(0.4);
 
+}
+
+float smin(float a,float b,float k){
+    float h = clamp(0.5+0.5*(a-b)/k,0.0,1.0);
+    return mix(a,b,h)-k*h*(1.0-h);
+}
+float smax(float a,float b,float k){
+    return -smin(-a,-b,k);
+}
+//Signed Distance Function of segment shape
+float udSegment(in vec2 p, in vec2 a, in vec2 b) {
+    vec2 ba = b-a;
+    vec2 pa = p-a;
+    float h = clamp(dot(pa,ba)/dot(ba,ba), 0.0, 1.0);
+    return length(pa-h*ba);
+}
+
+//Signed Distance Function of horsehoe shape
+float sdHorseshoe(in vec2 p, in vec2 c, in float r, in vec2 w) {
+    p.x = abs(p.x);
+    float l = length(p);
+    p = mat2(-c.x, c.y, 
+              c.y, c.x)*p;
+    p = vec2((p.y>0.0 || p.x>0.0)?p.x:l*sign(-c.x),
+             (p.x>0.0)?p.y:l);
+    p = vec2(p.x,abs(p.y-r))-w;
+    return length(max(p, 0.0)) + min(0.0, max(p.x, p.y));
+}
+
+//Signed Distance Function of Letter 'N'
+float N_sdf(in vec2 p) {
+    vec2 offset = vec2(-2.0, 0.0);
+    float d = udSegment(p-offset, vec2(-0.6, 2.0), vec2(-0.6, 4.0)) - 0.2;
+    float d1 = udSegment(p-offset, vec2(-0.6, 4.0), vec2(0.6, 2.0)) - 0.2;
+    float d2 = udSegment(p-offset, vec2(0.6, 2.0), vec2(0.6, 4.0)) - 0.2;
+    return smin(d2,smin(d, d1, 0.04), 0.04); 
+}
+
+//Signed Distance Function of Letter 'U'
+float U_sdf(in vec2 p) {
+    float d = udSegment(p, vec2(-0.6, 2.6), vec2(-0.6, 4.0)) - 0.2;
+    float d1 = sdHorseshoe(p-vec2(0.0, 2.6),vec2(cos(1.6), sin(1.6)), 0.6, vec2(0.2,0.2));
+    float d2 = udSegment(p, vec2(0.6, 2.6), vec2(0.6, 4.0)) - 0.2;
+    return smin(d2,smin(d, d1, 0.04), 0.04);
+}
+
+////Signed Distance Function of Letter 'S'
+float S_sdf(in vec2 p) {
+    vec2 offset = vec2(2.0, 0.0);
+    float d1 = udSegment(p-offset, vec2(-0.6, 2.0), vec2(0.2, 2.0)) - 0.2;
+    float d2 = udSegment(p-offset, vec2(-0.2, 4.0), vec2(0.6, 4.0)) - 0.2;
+    float d3 = udSegment(p-offset, vec2(-0.2, 3.0), vec2(0.2, 3.0)) - 0.2;
+    float d4 = sdHorseshoe(p.yx-offset.yx-vec2(3.5, -0.2),vec2(cos(1.6),sin(1.6)), 0.5, vec2(0.2,0.2));
+    float d5 = sdHorseshoe(-p.yx+offset.yx-vec2(-2.5, -0.2),vec2(cos(1.6),sin(1.6)), 0.5, vec2(0.2,0.2));
+    
+    return smin(d1,smin(d2,smin(d3,smin(d4,d5, 0.04), 0.04), 0.04), 0.04);
+}
+
+bool IntersectNUS(in vec2 p) {
+    return N_sdf(p)<0.0||U_sdf(p)<0.0||S_sdf(p)<0.0;
+}
 void InitScene() {
     seed = iTime + gl_FragCoord.y * gl_FragCoord.x / iResolution.x + gl_FragCoord.y / iResolution.y;
     InitPlane();
@@ -372,6 +434,10 @@ void InitScene() {
     InitLight();
     InitMaterial();
 }
+/////////////////////////////////////////////////////////////////////////////
+// Initializes the scene.
+/////////////////////////////////////////////////////////////////////////////
+
 
 // Generate basis matrix for given normal
 mat3 formBasis(vec3 n) {
@@ -665,6 +731,7 @@ Hit IntersectScene(Ray_t ray) {
                          nearest_hitMatID = Cube[i].materialID;
                       }
     }
+    if(nearest_hitMatID==10 && IntersectNUS(nearest_hitPos.zy))nearest_hitMatID = 11;
     return Hit(hasHitSomething, nearest_hitPos, nearest_hitNormal, nearest_hitMatID);
 }
 
