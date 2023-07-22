@@ -475,7 +475,9 @@ vec3 evalBRDF(vec3 n, vec3 v, vec3 l, Material_t m) {
 
     return (Kd * lambertBRFD(m.albedo) + cookTorranceBRDF(NoL, NoV, NoH, VoH, F, m.roughness)) * NoL;
 }
+//-------------------------------------------------------------------------
 
+//---Intersection-----------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////////
 // Computes intersection between a plane and a ray.
 // Returns true if there is an intersection where the ray parameter t is
@@ -617,7 +619,58 @@ bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax) 
 
     return true;
 }
+Hit IntersectScene(Ray_t ray) { 
+    bool hasHitSomething = false;
+    float nearest_t = ray.t;   // The ray parameter t at the nearest hit point.
+    vec3 nearest_hitPos;              // 3D position of the nearest hit point.
+    vec3 nearest_hitNormal;           // Normal vector at the nearest hit point.
+    int nearest_hitMatID;             // MaterialID of the object at the nearest hit point.
 
+    float temp_t;
+    vec3 temp_hitPos;
+    vec3 temp_hitNormal;
+    bool temp_hasHit;
+    
+    for (int i = 0; i < NUM_PLANES; i++) {
+        if (IntersectPlane(Plane[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
+            temp_hasHit = true;
+            if (temp_t < nearest_t) {
+                nearest_t = temp_t;
+                nearest_hitPos = temp_hitPos;
+                nearest_hitNormal = temp_hitNormal;
+                nearest_hitMatID = Plane[i].materialID;
+                hasHitSomething = temp_hasHit;
+            }
+        }
+    }
+    for (int i = 0; i < NUM_SPHERES; i++) {
+        if (IntersectSphere(Sphere[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
+            temp_hasHit = true;
+            if (temp_t < nearest_t) {
+                nearest_t = temp_t;
+                nearest_hitPos = temp_hitPos;
+                nearest_hitNormal = temp_hitNormal;
+                nearest_hitMatID = Sphere[i].materialID;
+                hasHitSomething = temp_hasHit;
+            }
+        }
+    }
+    for (int i = 0; i < NUM_CUBES; i++) {
+        if(IntersectCube(Cube[i], ray, DEFAULT_TMIN, nearest_t,
+                      temp_t, temp_hitPos, temp_hitNormal)) {
+                         hasHitSomething = true;
+                         nearest_t = temp_t;
+                         nearest_hitPos = temp_hitPos;
+                         nearest_hitNormal = temp_hitNormal;
+                         nearest_hitMatID = Cube[i].materialID;
+                      }
+    }
+    return Hit(hasHitSomething, nearest_hitPos, nearest_hitNormal, nearest_hitMatID);
+}
+
+//----------------------------------------------------------------------
+
+//---Movement-----------------------------------------------------------
 void CalcMove(in int sph) {
     vec3 holePos = vec3(18.0, 0.5, -9.0);
     vec3 centerPos = Sphere[sph].center;
@@ -670,56 +723,7 @@ void Movement() {
     int turn = int(mod(iTime / T, 4.0));
     CalcMove(17 + turn);
 }
-
-
-Hit IntersectScene(Ray_t ray) { 
-    bool hasHitSomething = false;
-    float nearest_t = ray.t;   // The ray parameter t at the nearest hit point.
-    vec3 nearest_hitPos;              // 3D position of the nearest hit point.
-    vec3 nearest_hitNormal;           // Normal vector at the nearest hit point.
-    int nearest_hitMatID;             // MaterialID of the object at the nearest hit point.
-
-    float temp_t;
-    vec3 temp_hitPos;
-    vec3 temp_hitNormal;
-    bool temp_hasHit;
-    
-    for (int i = 0; i < NUM_PLANES; i++) {
-        if (IntersectPlane(Plane[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
-            temp_hasHit = true;
-            if (temp_t < nearest_t) {
-                nearest_t = temp_t;
-                nearest_hitPos = temp_hitPos;
-                nearest_hitNormal = temp_hitNormal;
-                nearest_hitMatID = Plane[i].materialID;
-                hasHitSomething = temp_hasHit;
-            }
-        }
-    }
-    for (int i = 0; i < NUM_SPHERES; i++) {
-        if (IntersectSphere(Sphere[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
-            temp_hasHit = true;
-            if (temp_t < nearest_t) {
-                nearest_t = temp_t;
-                nearest_hitPos = temp_hitPos;
-                nearest_hitNormal = temp_hitNormal;
-                nearest_hitMatID = Sphere[i].materialID;
-                hasHitSomething = temp_hasHit;
-            }
-        }
-    }
-    for (int i = 0; i < NUM_CUBES; i++) {
-        if(IntersectCube(Cube[i], ray, DEFAULT_TMIN, nearest_t,
-                      temp_t, temp_hitPos, temp_hitNormal)) {
-                         hasHitSomething = true;
-                         nearest_t = temp_t;
-                         nearest_hitPos = temp_hitPos;
-                         nearest_hitNormal = temp_hitNormal;
-                         nearest_hitMatID = Cube[i].materialID;
-                      }
-    }
-    return Hit(hasHitSomething, nearest_hitPos, nearest_hitNormal, nearest_hitMatID);
-}
+//----------------------------------------------------------------------
 
 bool rayOutScene(vec3 pos){
     //return pos.z < -5.0; // Change it!
@@ -731,7 +735,6 @@ vec3 Monte_Carlo_Raytracing() {
     vec3 result = vec3(0);
     for (int j = 0; j < SAMPLES_PER_PIXEL; j++) {
         // Generate ray
-        
         vec2 sample_px = gl_FragCoord.xy + vec2(rnd(), rnd());
         vec3 pixel_pos = vec3((2.0 * sample_px.xy - iResolution.xy) / iResolution.y, -1.0 / tan(FOVY / 2.0));
         Ray_t pRay;
@@ -816,5 +819,5 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord)
     Movement();
     SetCamera();
     vec3 result = Monte_Carlo_Raytracing();
-    fragColor = vec4(result, 1.0);
+    fragColor = vec4(ltos3(result.x, result.y, result.z), 1.0); // Gamma correct
 }
