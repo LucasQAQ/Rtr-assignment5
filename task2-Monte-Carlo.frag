@@ -46,9 +46,9 @@ const float DEFAULT_TMAX = 10.0e6;
 
 // Constants for the scene objects.
 const int NUM_LIGHTS = 3;
-const int NUM_MATERIALS = 13;
+const int NUM_MATERIALS = 16;
 const int NUM_SPHERES = 22;
-const int NUM_CUBES = 7;
+const int NUM_CUBES = 17;
 const int NUM_PLANES = 5;
 
 
@@ -145,14 +145,14 @@ void InitPlane() {
     Plane[3].A = 0.0;
     Plane[3].B = 0.0;
     Plane[3].C = -1.0;
-    Plane[3].D = 20.0;
+    Plane[3].D = 25.0;
     Plane[3].materialID = 10;
     
     // Back Plane
     Plane[4].A = 0.0;
     Plane[4].B = 0.0;
     Plane[4].C = 1.0;
-    Plane[4].D = 20.0;
+    Plane[4].D = 25.0;
     Plane[4].materialID = 10;
 }
 
@@ -271,6 +271,56 @@ void InitCube() {
     Cube[6].center = vec3(0.0, -0.05, 0.0);
     Cube[6].size = vec3(38.0, 0.1, 20.0);
     Cube[6].materialID = 8;
+    
+    // Hole Plane
+    Cube[7].center = vec3(0.0, -0.15, 0.0);
+    Cube[7].size = vec3(38.4, 0.1, 20.4);
+    Cube[7].materialID = 13;
+    
+    // Second Plane
+    Cube[8].center = vec3(0.0, -1.7, 0.0);
+    Cube[8].size = vec3(39.2, 3.0, 21.2);
+    Cube[8].materialID = 14;
+    
+    // Front Fence
+    Cube[9].center = vec3(0.0, 0.28, 10.4);
+    Cube[9].size = vec3(39.2, 0.96, 0.4);
+    Cube[9].materialID = 9;
+    
+    // Back Fence
+    Cube[10].center = vec3(0.0, 0.28, -10.4);
+    Cube[10].size = vec3(39.2, 0.96, 0.4);
+    Cube[10].materialID = 9;
+    
+    // Left Fence
+    Cube[11].center = vec3(-19.4, 0.28, 0.0);
+    Cube[11].size = vec3(0.4, 0.96, 20.4);
+    Cube[11].materialID = 9;
+    
+    // Right Fence
+    Cube[12].center = vec3(19.4, 0.28, 0.0);
+    Cube[12].size = vec3(0.4, 0.96, 20.4);
+    Cube[12].materialID = 9;
+
+    // First Leg
+    Cube[13].center = vec3(-18.15, -6.4, 9.15);
+    Cube[13].size = vec3(2.5, 6.4, 2.5);
+    Cube[13].materialID = 15;   
+    
+    // Second Leg
+    Cube[14].center = vec3(18.15, -6.4, 9.15);
+    Cube[14].size = vec3(2.5, 6.4, 2.5);
+    Cube[14].materialID = 15;
+    
+    // Third Leg
+    Cube[15].center = vec3(-18.15, -6.4, -9.15);
+    Cube[15].size = vec3(2.5, 6.4, 2.5);
+    Cube[15].materialID = 15;
+    
+    // Fourth Leg
+    Cube[16].center = vec3(18.15, -6.4, -9.15);
+    Cube[16].size = vec3(2.5, 6.4, 2.5);
+    Cube[16].materialID = 15;
 }
 
 void InitLight() {
@@ -396,6 +446,21 @@ void InitMaterial() {
     Material[12].roughness = 0.8;
     Material[12].metalness = 0.8;
     Material[12].emission = vec3(0.0);
+    // Hole Material
+    Material[13].albedo = vec3(0.02, 0.02, 0.02);
+    Material[13].roughness = 1.0;
+    Material[13].metalness = 0.0;
+    Material[13].emission = vec3(0.0);
+    // Second Plane Material
+    Material[14].albedo = vec3(0.95, 0.90, 0.2);
+    Material[14].roughness = 0.5;
+    Material[14].metalness = 0.6;
+    Material[14].emission = vec3(0.0);
+    // Leg Material
+    Material[15].albedo = vec3(0.46, 0.63, 0.69);
+    Material[15].roughness = 0.5;
+    Material[15].metalness = 0.5;
+    Material[15].emission = vec3(0.0);
 }
 
 float smin(float a,float b,float k){
