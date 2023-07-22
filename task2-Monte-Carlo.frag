@@ -15,7 +15,7 @@
 // COMMENTS TO GRADER:
 //
 //============================================================================
-const int SAMPLES_PER_PIXEL = 100;
+const int SAMPLES_PER_PIXEL = 200;
 const float PI = 3.1415926536;
 const int BOUNCES = 3;
 const float P_TERMINATE = 0.75;
@@ -45,10 +45,11 @@ const float DEFAULT_TMAX = 10.0e6;
 
 
 // Constants for the scene objects.
-const int NUM_LIGHTS = 2;
-const int NUM_MATERIALS = 9;
+const int NUM_LIGHTS = 3;
+const int NUM_MATERIALS = 11;
 const int NUM_SPHERES = 22;
-const int NUM_CUBES = 1;
+const int NUM_CUBES = 7;
+const int NUM_PLANES = 5;
 
 
 //============================================================================
@@ -110,25 +111,49 @@ struct Light_t {
 // Global scene data.
 //============================================================================
 
-Plane_t Table;
+Plane_t Plane[NUM_PLANES];
 Sphere_t Sphere[NUM_SPHERES];
 Cube_t Cube[NUM_CUBES];
 Light_t Light[NUM_LIGHTS];
 Material_t Material[NUM_MATERIALS];
 Camera camera;
 
-void InitTable() {
-    // Snooker Table Plane
-    Table.A = 0.0;
-    Table.B = 1.0;
-    Table.C = 0.0;
-    Table.D = 0.0;
-    Table.materialID = 8;
-    // Table Material
-    Material[8].albedo = vec3(0.42, 0.56, 0.14);
-    Material[8].roughness = 1.0;
-    Material[8].metalness = 0.0;
-    Material[8].emission = vec3(0.0);
+void InitPlane() {
+    
+    // Bottom Plane
+    Plane[0].A = 0.0;
+    Plane[0].B = 1.0;
+    Plane[0].C = 0.0;
+    Plane[0].D = 3.0;
+    Plane[0].materialID = 10;
+    
+    // Left Plane
+    Plane[1].A = -1.0;
+    Plane[1].B = 0.0;
+    Plane[1].C = 0.0;
+    Plane[1].D = 30.0;
+    Plane[1].materialID = 10;
+    
+    // Right Plane
+    Plane[2].A = 1.0;
+    Plane[2].B = 0.0;
+    Plane[2].C = 0.0;
+    Plane[2].D = 30.0;
+    Plane[2].materialID = 10;
+    
+    // Front Plane
+    Plane[3].A = 0.0;
+    Plane[3].B = 0.0;
+    Plane[3].C = -1.0;
+    Plane[3].D = 20.0;
+    Plane[3].materialID = 10;
+    
+    // Back Plane
+    Plane[4].A = 0.0;
+    Plane[4].B = 0.0;
+    Plane[4].C = 1.0;
+    Plane[4].D = 20.0;
+    Plane[4].materialID = 10;
 }
 
 void InitBall() {
@@ -137,11 +162,6 @@ void InitBall() {
     Sphere[0].radius = 0.5;
     Sphere[0].materialID = 0;
     
-    // Black Plastic Material
-    Material[0].albedo = vec3(0, 0, 0);
-    Material[0].roughness = 1.0;
-    Material[0].metalness = 0.0;
-    Material[0].emission = vec3(0.0);
 
     // Red Ball * 15
     for (int i = 1; i <= 15; i++) {
@@ -178,84 +198,79 @@ void InitBall() {
     
     Sphere[15].center = vec3(-8.52, 0.5, 0.0);
     
-    // Red Plastic Material
-    Material[1].albedo = vec3(0.89, 0.09, 0.05);
-    Material[1].roughness = 1.0;
-    Material[1].metalness = 0.0;
-    Material[1].emission = vec3(0.0);
 
     // Purple Ball
     Sphere[16].center = vec3(-7.52, 0.5, 0.0);
     Sphere[16].radius = 0.5;
     Sphere[16].materialID = 2;
     
-    // Purple Plastic Material
-    Material[2].albedo = vec3(0.86, 0.44, 0.84);
-    Material[2].roughness = 1.0;
-    Material[2].metalness = 0.0;
-    Material[2].emission = vec3(0.0);
     
     // Blue Ball
     Sphere[17].center = vec3(0.0, 0.5, 0.0);
     Sphere[17].radius = 0.5;
     Sphere[17].materialID = 3;
     
-    // Blue Plastic Material
-    Material[3].albedo = vec3(0.0, 0.0, 1.0);
-    Material[3].roughness = 1.0;
-    Material[3].metalness = 0.0;
-    Material[3].emission = vec3(0.0);
 
     // Green Ball
     Sphere[18].center = vec3(11.0, 0.5, 2.5);
     Sphere[18].radius = 0.5;
     Sphere[18].materialID = 4;
     
-    // Green Plastic Material
-    Material[4].albedo = vec3(0.13, 0.55, 0.13);
-    Material[4].roughness = 1.0;
-    Material[4].metalness = 0.0;
-    Material[4].emission = vec3(0.0);
     
     // Brown Ball
     Sphere[19].center = vec3(11.0, 0.5, 0.0);
     Sphere[19].radius = 0.5;
     Sphere[19].materialID = 5;
     
-    // Brown Plastic Material
-    Material[5].albedo = vec3(0.78, 0.38, 0.08);
-    Material[5].roughness = 1.0;
-    Material[5].metalness = 0.0;
-    Material[5].emission = vec3(0.0);
 
     // Yellow Ball
     Sphere[20].center = vec3(11.0, 0.5, -2.5);
     Sphere[20].radius = 0.5;
     Sphere[20].materialID = 6;
     
-    // Yellow Plastic Material
-    Material[6].albedo = vec3(1.0, 1.0, 0.0);
-    Material[6].roughness = 1.0;
-    Material[6].metalness = 0.0;
-    Material[6].emission = vec3(0.0);
 
     // White Ball
     Sphere[21].center = vec3(3.0, 0.5, 4.5);
     Sphere[21].radius = 0.5;
     Sphere[21].materialID = 7;
 
-    // White Plastic Material
-    Material[7].albedo = vec3(1.0, 1.0, 1.0);
-    Material[7].roughness = 1.0;
-    Material[7].metalness = 0.0;
-    Material[7].emission = vec3(0.0);
 }
 
 void InitCube() {
-    //cube1
-    Cube[0].center = vec3(0.0, 0.5, -10.0);
-    Cube[0].size = vec3(50.0, 1.0, 1.0);
-    Cube[0].materialID = 5;
+    // Back Left Baffle
+    Cube[0].center = vec3(-8.75, 0.5, -9.5);
+    Cube[0].size = vec3(16.3, 1.0, 1.0);
+    Cube[0].materialID = 9;
+    
+    // Back Right Baffle
+    Cube[1].center = vec3(8.75, 0.5, -9.5);
+    Cube[1].size = vec3(16.3, 1.0, 1.0);
+    Cube[1].materialID = 9;
+    
+    // Front Left Baffle
+    Cube[2].center = vec3(-8.75, 0.5, 9.5);
+    Cube[2].size = vec3(16.3, 1.0, 1.0);
+    Cube[2].materialID = 9;
+    
+    // Front Right Baffle
+    Cube[3].center = vec3(8.75, 0.5, 9.5);
+    Cube[3].size = vec3(16.3, 1.0, 1.0);
+    Cube[3].materialID = 9;
+    
+    // Left Baffle
+    Cube[4].center = vec3(-18.5, 0.5, 0.0);
+    Cube[4].size = vec3(1.0, 1.0, 15.8);
+    Cube[4].materialID = 9;
+    
+    // Right Baffle
+    Cube[5].center = vec3(18.5, 0.5, 0.0);
+    Cube[5].size = vec3(1.0, 1.0, 15.8);
+    Cube[5].materialID = 9;
+    
+    // Table Plane
+    Cube[6].center = vec3(0.0, -0.05, 0.0);
+    Cube[6].size = vec3(38.0, 0.1, 20.0);
+    Cube[6].materialID = 8;
 }
 
 void InitLight() {
@@ -264,19 +279,86 @@ void InitLight() {
                              0, 1, 0, 0,
                              0, 0, 1, 0,
                              0, 5, 0, 1);
-    Light[0].size = vec2(1);
-    Light[0].E = vec3(0.85, 0.8, 0.4) * vec3(30);
+    Light[0].size = vec2(20);
+    Light[0].E = vec3(1, 1, 1) * vec3(3);
     Light[0].normal = vec3(0, -1 ,0);
     
     // Light 1
     Light[1].worldMat = mat4(1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 10, 0, 1);
-    Light[1].size = vec2(1);
-    Light[1].E = vec3(0.85, 0.8, 0.4) * vec3(30);
-    Light[1].normal = vec3(0, -1, 0);
+                             0, 100, 0, 1);
+    Light[1].size = vec2(20);
+    Light[1].E = vec3(1, 1, 1) * vec3(5);
+    Light[1].normal = normalize(vec3(0, -1, -1));
+    // Light 2
+    Light[2].worldMat = mat4(1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0, 20, -20, 1);
+    Light[2].size = vec2(2);
+    Light[2].E = vec3(1, 1, 1) * vec3(100);
+    Light[2].normal = normalize(vec3(0, -1, 1));
 
+
+}
+void InitMaterial() {
+    
+    // Black Plastic Material
+    Material[0].albedo = vec3(0, 0, 0);
+    Material[0].roughness = 0.8;
+    Material[0].metalness = 0.2;
+    Material[0].emission = vec3(0.0);
+    // Red Plastic Material
+    Material[1].albedo = vec3(0.89, 0.09, 0.05);
+    Material[1].roughness = 0.8;
+    Material[1].metalness = 0.2;
+    Material[1].emission = vec3(0.0);
+    // Purple Plastic Material
+    Material[2].albedo = vec3(0.86, 0.44, 0.84);
+    Material[2].roughness = 0.8;
+    Material[2].metalness = 0.2;
+    Material[2].emission = vec3(0.0);
+    // Blue Plastic Material
+    Material[3].albedo = vec3(0.0, 0.0, 1.0);
+    Material[3].roughness = 0.8;
+    Material[3].metalness = 0.2;
+    Material[3].emission = vec3(0.0);
+    // Green Plastic Material
+    Material[4].albedo = vec3(0.13, 0.55, 0.13);
+    Material[4].roughness = 0.8;
+    Material[4].metalness = 0.2;
+    Material[4].emission = vec3(0.0);
+    // Brown Plastic Material
+    Material[5].albedo = vec3(0.78, 0.38, 0.08);
+    Material[5].roughness = 0.8;
+    Material[5].metalness = 0.2;
+    Material[5].emission = vec3(0.0);
+    // Yellow Plastic Material
+    Material[6].albedo = vec3(1.0, 1.0, 0.0);
+    Material[6].roughness = 0.8;
+    Material[6].metalness = 0.2;
+    Material[6].emission = vec3(0.0);
+    // White Plastic Material
+    Material[7].albedo = vec3(1.0, 1.0, 1.0);
+    Material[7].roughness = 0.2;
+    Material[7].metalness = 0.8;
+    Material[7].emission = vec3(0.0);
+    // Table Material
+    Material[8].albedo = vec3(0.42, 0.56, 0.14);
+    Material[8].roughness = 0.8;
+    Material[8].metalness = 0.5;
+    Material[8].emission = vec3(0.0);
+    // Baffle Material
+    Material[9].albedo = vec3(0.18, 0.17, 0.23);
+    Material[9].roughness = 1.0;
+    Material[9].metalness = 0.2;
+    Material[9].emission = vec3(0.0);
+    // Room Material
+    Material[10].albedo = vec3(1, 1, 1);
+    Material[10].roughness = 0.3;
+    Material[10].metalness = 1.0;
+    Material[10].emission = vec3(0.4);
 }
 /////////////////////////////////////////////////////////////////////////////
 // Initializes the scene.
@@ -284,15 +366,15 @@ void InitLight() {
 
 void InitScene() {
     seed = iTime + gl_FragCoord.y * gl_FragCoord.x / iResolution.x + gl_FragCoord.y / iResolution.y;
-    InitTable();
+    InitPlane();
     InitBall();
     InitCube();
     InitLight();
+    InitMaterial();
 }
 
 // Generate basis matrix for given normal
-mat3 formBasis(vec3 n)
-{
+mat3 formBasis(vec3 n) {
     // Make vector q that is non-parallel to n
     vec3 q = n;
     vec3 aq = abs(q);
@@ -342,14 +424,12 @@ float cosineHemispherePDF(float NoL) {
 
 // --SHADING-------------------------------------------------------------------
 // Lambert diffuse term
-vec3 lambertBRFD(vec3 albedo)
-{
+vec3 lambertBRFD(vec3 albedo) {
     return albedo / PI;
 }
 
 // GGX distribution function
-float ggx(float NoH, float roughness)
-{
+float ggx(float NoH, float roughness) {
     float a2 = roughness * roughness;
     a2 *= a2;
     float denom = NoH * NoH * (a2 - 1.0) + 1.0;
@@ -357,14 +437,12 @@ float ggx(float NoH, float roughness)
 }
 
 // Schlick fresnel function
-vec3 schlickFresnel(float VoH, vec3 f0)
-{
+vec3 schlickFresnel(float VoH, vec3 f0) {
     return f0 + (1.0 - f0) * pow(1.0 - VoH, 5.0);
 }
 
 // Schlick-GGX geometry function
-float schlick_ggx(float NoL, float NoV, float roughness)
-{
+float schlick_ggx(float NoL, float NoV, float roughness) {
     float k = roughness + 1.0;
     k *= k * 0.125;
     float gl = NoL / (NoL * (1.0 - k) + k);
@@ -487,8 +565,7 @@ bool IntersectSphere(in Sphere_t sph, in Ray_t ray, in float tmin, in float tmax
 
 }
 
-bool IntersectCube(in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
-                      out float t, out vec3 hitPos, out vec3 hitNormal) {
+bool IntersectCube(in Cube_t cube, in Ray_t ray, in float tmin, in float tmax, out float t, out vec3 hitPos, out vec3 hitNormal) {
     vec3 minBound = cube.center - (cube.size / 2.0); // Compute the minimum boundaries of the cube.
     vec3 maxBound = cube.center + (cube.size / 2.0); // Compute the maximum boundaries of the cube.
     // Compute the intersection of ray and planes of cube
@@ -522,7 +599,7 @@ bool IntersectCube(in Cube_t cube, in Ray_t ray, in float tmin, in float tmax,
 }
 
 
-bool IntersectCube(in Cube_t cube, in Ray_t ray, in float tmin, in float tmax) {
+bool IntersectCube( in Cube_t cube, in Ray_t ray, in float tmin, in float tmax) {
     vec3 minBound = cube.center - (cube.size / 2.0);
     vec3 maxBound = cube.center + (cube.size / 2.0);
 
@@ -539,7 +616,6 @@ bool IntersectCube(in Cube_t cube, in Ray_t ray, in float tmin, in float tmax) {
         return false;
 
     return true;
-
 }
 
 void CalcMove(in int sph) {
@@ -608,14 +684,16 @@ Hit IntersectScene(Ray_t ray) {
     vec3 temp_hitNormal;
     bool temp_hasHit;
     
-    if (IntersectPlane(Table, ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
-        temp_hasHit = true;
-        if (temp_t < nearest_t) {
-            nearest_t = temp_t;
-            nearest_hitPos = temp_hitPos;
-            nearest_hitNormal = temp_hitNormal;
-            nearest_hitMatID = Table.materialID;
-            hasHitSomething = temp_hasHit;
+    for (int i = 0; i < NUM_PLANES; i++) {
+        if (IntersectPlane(Plane[i], ray, DEFAULT_TMIN, nearest_t, temp_t, temp_hitPos, temp_hitNormal) == true) {
+            temp_hasHit = true;
+            if (temp_t < nearest_t) {
+                nearest_t = temp_t;
+                nearest_hitPos = temp_hitPos;
+                nearest_hitNormal = temp_hitNormal;
+                nearest_hitMatID = Plane[i].materialID;
+                hasHitSomething = temp_hasHit;
+            }
         }
     }
     for (int i = 0; i < NUM_SPHERES; i++) {
@@ -631,8 +709,8 @@ Hit IntersectScene(Ray_t ray) {
         }
     }
     for (int i = 0; i < NUM_CUBES; i++) {
-        if(IntersectCube( Cube[i], ray, DEFAULT_TMIN, DEFAULT_TMAX,
-                      temp_t, temp_hitPos, temp_hitNormal ) && temp_t < nearest_t) {
+        if(IntersectCube(Cube[i], ray, DEFAULT_TMIN, nearest_t,
+                      temp_t, temp_hitPos, temp_hitNormal)) {
                          hasHitSomething = true;
                          nearest_t = temp_t;
                          nearest_hitPos = temp_hitPos;
@@ -644,7 +722,8 @@ Hit IntersectScene(Ray_t ray) {
 }
 
 bool rayOutScene(vec3 pos){
-    return pos.z < -5.0; // Change it!
+    //return pos.z < -5.0; // Change it!
+    return false;
 }
 
 vec3 Monte_Carlo_Raytracing() {
@@ -665,11 +744,7 @@ vec3 Monte_Carlo_Raytracing() {
 
         while (true) {
             Hit hit = IntersectScene(pRay);
-
-            // Cut ray on miss, "backface" hit or being outside the box
-            if (!hit.hit || dot(hit.normal, pRay.d) > 0.0 || rayOutScene(hit.position))
-                break;
-
+            if(!hit.hit || rayOutScene(hit.position))break;
             Material_t m = Material[hit.MaterialID];
             vec3 n = hit.normal;
             vec3 p = hit.position + hit.normal * EPSILON;
