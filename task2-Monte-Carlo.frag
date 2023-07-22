@@ -46,7 +46,7 @@ const float DEFAULT_TMAX = 10.0e6;
 
 // Constants for the scene objects.
 const int NUM_LIGHTS = 3;
-const int NUM_MATERIALS = 12;
+const int NUM_MATERIALS = 13;
 const int NUM_SPHERES = 22;
 const int NUM_CUBES = 7;
 const int NUM_PLANES = 5;
@@ -125,7 +125,7 @@ void InitPlane() {
     Plane[0].B = 1.0;
     Plane[0].C = 0.0;
     Plane[0].D = 3.0;
-    Plane[0].materialID = 10;
+    Plane[0].materialID = 12;
     
     // Left Plane
     Plane[1].A = -1.0;
@@ -302,6 +302,24 @@ void InitLight() {
 
 
 }
+const vec2 s = vec2(1, 1.7320508);
+
+float hex(in vec2 p){
+    p = abs(p);
+    return max(dot(p, s*.5), p.x);
+}
+
+vec4 getHex(vec2 p){
+    vec4 hC = floor(vec4(p, p - vec2(.5, 1))/s.xyxy) + .5;
+    vec4 h = vec4(p - hC.xy*s, p - (hC.zw + .5)*s);
+    return dot(h.xy, h.xy)<dot(h.zw, h.zw) ? vec4(h.xy, hC.xy) : vec4(h.zw, hC.zw + vec2(.5, 1)); 
+}
+
+float aafract(float x) {
+    float v = fract(x),
+          w = fwidth(x);
+    return v < 1.-w ? v/(1.-w) : (1.-v)/w;
+}
 void InitMaterial() {
     
     // Black Plastic Material
@@ -341,8 +359,8 @@ void InitMaterial() {
     Material[6].emission = vec3(0.0);
     // White Plastic Material
     Material[7].albedo = vec3(1.0, 1.0, 1.0);
-    Material[7].roughness = 0.2;
-    Material[7].metalness = 0.8;
+    Material[7].roughness = 0.8;
+    Material[7].metalness = 0.2;
     Material[7].emission = vec3(0.0);
     // Table Material
     Material[8].albedo = vec3(0.02, 0.36, 0.04);
@@ -351,20 +369,33 @@ void InitMaterial() {
     Material[8].emission = vec3(0.0);
     // Baffle Material
     Material[9].albedo = vec3(0.2, 0.05, 0.04);
-    Material[9].roughness = 1.0;
+    Material[9].roughness = 0.8;
     Material[9].metalness = 0.2;
     Material[9].emission = vec3(0.0);
     // Room Material
     Material[10].albedo = vec3(1, 1, 1);
-    Material[10].roughness = 0.3;
-    Material[10].metalness = 1.0;
+    Material[10].roughness = 1.0;
+    Material[10].metalness = 0.2;
     Material[10].emission = vec3(0.0);
     // NUS Material
     Material[11].albedo = vec3(0.0, 0.0, 0.6);
     Material[11].roughness = 0.8;
     Material[11].metalness = 0.2;
     Material[11].emission = vec3(0.4);
-
+    // Floor Material
+    vec2 uv = 6.*gl_FragCoord.xy / iResolution.xy / s;
+    vec4 h1 = getHex(uv);
+    vec4 h2 = getHex(uv - 1./s);
+    vec4 h3 = getHex(uv + 1./s);
+    
+    float v1 = aafract(hex(h1.xy)/.2);
+    float v2 = aafract(hex(1.5*h2.xy)/0.45);
+    float v3 = aafract(hex(2.*h3.xy)/0.3);
+    
+    Material[12].albedo = vec3(vec3(v1+v2+v3).r/8., 0, 0);
+    Material[12].roughness = 0.8;
+    Material[12].metalness = 0.8;
+    Material[12].emission = vec3(0.0);
 }
 
 float smin(float a,float b,float k){
