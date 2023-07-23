@@ -416,6 +416,11 @@ void InitMaterial() {
     Material[11].roughness = 0.8;
     Material[11].metalness = 0.2;
     Material[11].emission = vec3(0.4);
+    // Floor Material
+    Material[12].albedo = vec3(1, 1, 1);
+    Material[12].roughness = 1.0;
+    Material[12].metalness = 0.2;
+    Material[12].emission = vec3(0.0);
     // Hole Material
     Material[13].albedo = vec3(0.02, 0.02, 0.02);
     Material[13].roughness = 1.0;
@@ -447,8 +452,9 @@ void getFloorMaterial(vec2 xz) {
     float v3 = aafract(hex(2.*h3.xy)/0.3);
     
     Material[12].albedo = vec3(vec3(v1+v2+v3).r/8., 0, 0);
+    
     Material[12].roughness = 0.8;
-    Material[12].metalness = 0.8;
+    Material[12].metalness = 0.0;
     Material[12].emission = vec3(0.0);
 }
 
