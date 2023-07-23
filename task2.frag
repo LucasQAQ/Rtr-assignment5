@@ -44,9 +44,9 @@ const float DEFAULT_TMAX = 10.0e6;
 
 // Constants for the scene objects.
 const int NUM_LIGHTS = 3;
-const int NUM_MATERIALS = 13;
+const int NUM_MATERIALS = 17;
 const int NUM_SPHERES = 22;
-const int NUM_CUBES = 7;
+const int NUM_CUBES = 17;
 const int NUM_PLANES = 5;
 
 
@@ -120,7 +120,7 @@ void InitPlane() {
     Plane[0].A = 0.0;
     Plane[0].B = 1.0;
     Plane[0].C = 0.0;
-    Plane[0].D = 3.0;
+    Plane[0].D = 9.65;
     Plane[0].materialID = 12;
     
     // Left Plane
@@ -141,20 +141,22 @@ void InitPlane() {
     Plane[3].A = 0.0;
     Plane[3].B = 0.0;
     Plane[3].C = -1.0;
-    Plane[3].D = 20.0;
+    Plane[3].D = 25.0;
     Plane[3].materialID = 10;
     
     // Back Plane
     Plane[4].A = 0.0;
     Plane[4].B = 0.0;
     Plane[4].C = 1.0;
-    Plane[4].D = 20.0;
+    Plane[4].D = 25.0;
     Plane[4].materialID = 10;
 }
 
 void InitBall() {
+    float timeBias = 0.06;
+    
     // Black Ball
-    Sphere[0].center = vec3(-15.0, 0.5, 0.0);
+    Sphere[0].center = vec3(-15.0, 0.5 + 2.0 * abs(cos(5.0 * iTime)), 0.0);
     Sphere[0].radius = 0.5;
     Sphere[0].materialID = 0;
     
@@ -164,39 +166,40 @@ void InitBall() {
         Sphere[i].radius = 0.5;
         Sphere[i].materialID = 1;
     }
-    Sphere[1].center = vec3(-12.0, 0.5, 2.0);
+    float time = iTime;
+    Sphere[1].center = vec3(-12.0, 0.5 + 2.0 * abs(cos(5.0 * (iTime + timeBias))), 2.0);
     
-    Sphere[2].center = vec3(-12.0, 0.5, 1.0);
+    Sphere[2].center = vec3(-12.0, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 2.0 * timeBias))), 1.0);
     
-    Sphere[3].center = vec3(-12.0, 0.5, 0.0);
+    Sphere[3].center = vec3(-12.0, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 3.0 * timeBias))), 0.0);
     
-    Sphere[4].center = vec3(-12.0, 0.5, -1.0);
+    Sphere[4].center = vec3(-12.0, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 4.0 * timeBias))), -1.0);
     
-    Sphere[5].center = vec3(-12.0, 0.5, -2.0);
+    Sphere[5].center = vec3(-12.0, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 5.0 * timeBias))), -2.0);
     
-    Sphere[6].center = vec3(-11.13, 0.5, 1.5);
+    Sphere[6].center = vec3(-11.13, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 6.0 * timeBias))), 1.5);
     
-    Sphere[7].center = vec3(-11.14, 0.5, 0.5);
+    Sphere[7].center = vec3(-11.14, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 7.0 * timeBias))), 0.5);
     
-    Sphere[8].center = vec3(-11.14, 0.5, -0.5);
+    Sphere[8].center = vec3(-11.14, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 8.0 * timeBias))), -0.5);
     
-    Sphere[9].center = vec3(-11.14, 0.5, -1.5);
+    Sphere[9].center = vec3(-11.14, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 9.0 * timeBias))), -1.5);
     
-    Sphere[10].center = vec3(-10.26, 0.5, 1.0);
+    Sphere[10].center = vec3(-10.26, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 10.0 * timeBias))), 1.0);
     
-    Sphere[11].center = vec3(-10.28, 0.5, 0.0);
+    Sphere[11].center = vec3(-10.28, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 11.0 * timeBias))), 0.0);
     
-    Sphere[12].center = vec3(-10.28, 0.5, -1.0);
+    Sphere[12].center = vec3(-10.28, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 12.0 * timeBias))), -1.0);
     
-    Sphere[13].center = vec3(-9.39, 0.5, 0.5);
+    Sphere[13].center = vec3(-9.39, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 13.0 * timeBias))), 0.5);
     
-    Sphere[14].center = vec3(-9.39, 0.5, -0.5);
+    Sphere[14].center = vec3(-9.39, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 14.0 * timeBias))), -0.5);
     
-    Sphere[15].center = vec3(-8.52, 0.5, 0.0);
+    Sphere[15].center = vec3(-8.52, 0.5 + 2.0 * abs(cos(5.0 * (iTime + 15.0 * timeBias))), 0.0);
     
 
     // Purple Ball
-    Sphere[16].center = vec3(-7.52, 0.5, 0.0);
+    Sphere[16].center = vec3(-7.52, 0.5 + 2.0 * abs(sin(5.0 * iTime)), 0.0);
     Sphere[16].radius = 0.5;
     Sphere[16].materialID = 2;
     
@@ -226,7 +229,7 @@ void InitBall() {
     
 
     // White Ball
-    Sphere[21].center = vec3(3.0, 0.5, 4.5);
+    Sphere[21].center = vec3(-4.0, 0.5, 6.0);
     Sphere[21].radius = 0.5;
     Sphere[21].materialID = 7;
 
@@ -234,52 +237,102 @@ void InitBall() {
 
 void InitCube() {
     // Back Left Baffle
-    Cube[0].center = vec3(-8.75, 0.5, -9.5);
-    Cube[0].size = vec3(16.3, 1.0, 1.0);
+    Cube[0].center = vec3(-8.75, 0.38, -9.6);
+    Cube[0].size = vec3(16.3, 0.76, 1.2);
     Cube[0].materialID = 9;
     
     // Back Right Baffle
-    Cube[1].center = vec3(8.75, 0.5, -9.5);
-    Cube[1].size = vec3(16.3, 1.0, 1.0);
+    Cube[1].center = vec3(8.75, 0.38, -9.6);
+    Cube[1].size = vec3(16.3, 0.76, 1.2);
     Cube[1].materialID = 9;
     
     // Front Left Baffle
-    Cube[2].center = vec3(-8.75, 0.5, 9.5);
-    Cube[2].size = vec3(16.3, 1.0, 1.0);
+    Cube[2].center = vec3(-8.75, 0.38, 9.6);
+    Cube[2].size = vec3(16.3, 0.76, 1.2);
     Cube[2].materialID = 9;
     
     // Front Right Baffle
-    Cube[3].center = vec3(8.75, 0.5, 9.5);
-    Cube[3].size = vec3(16.3, 1.0, 1.0);
+    Cube[3].center = vec3(8.75, 0.38, 9.6);
+    Cube[3].size = vec3(16.3, 0.76, 1.2);
     Cube[3].materialID = 9;
     
     // Left Baffle
-    Cube[4].center = vec3(-18.5, 0.5, 0.0);
-    Cube[4].size = vec3(1.0, 1.0, 15.8);
+    Cube[4].center = vec3(-18.6, 0.38, 0.0);
+    Cube[4].size = vec3(1.2, 0.76, 15.8);
     Cube[4].materialID = 9;
     
     // Right Baffle
-    Cube[5].center = vec3(18.5, 0.5, 0.0);
-    Cube[5].size = vec3(1.0, 1.0, 15.8);
+    Cube[5].center = vec3(18.6, 0.38, 0.0);
+    Cube[5].size = vec3(1.2, 0.76, 15.8);
     Cube[5].materialID = 9;
     
     // Table Plane
     Cube[6].center = vec3(0.0, -0.05, 0.0);
-    Cube[6].size = vec3(38.0, 0.1, 20.0);
+    Cube[6].size = vec3(36.0, 0.1, 18.0);
     Cube[6].materialID = 8;
+    
+    // Hole Plane
+    Cube[7].center = vec3(0.0, -0.15, 0.0);
+    Cube[7].size = vec3(38.4, 0.1, 20.4);
+    Cube[7].materialID = 13;
+    
+    // Second Plane
+    Cube[8].center = vec3(0.0, -1.7, 0.0);
+    Cube[8].size = vec3(39.2, 3.0, 21.2);
+    Cube[8].materialID = 14;
+    
+    // Front Fence
+    Cube[9].center = vec3(0.0, 0.28, 10.4);
+    Cube[9].size = vec3(39.2, 0.96, 0.4);
+    Cube[9].materialID = 9;
+    
+    // Back Fence
+    Cube[10].center = vec3(0.0, 0.28, -10.4);
+    Cube[10].size = vec3(39.2, 0.96, 0.4);
+    Cube[10].materialID = 9;
+    
+    // Left Fence
+    Cube[11].center = vec3(-19.4, 0.28, 0.0);
+    Cube[11].size = vec3(0.4, 0.96, 20.4);
+    Cube[11].materialID = 9;
+    
+    // Right Fence
+    Cube[12].center = vec3(19.4, 0.28, 0.0);
+    Cube[12].size = vec3(0.4, 0.96, 20.4);
+    Cube[12].materialID = 9;
+    
+    // First Leg
+    Cube[13].center = vec3(-18.15, -6.4, 9.15);
+    Cube[13].size = vec3(2.5, 6.4, 2.5);
+    Cube[13].materialID = 15;
+    
+    // Second Leg
+    Cube[14].center = vec3(18.15, -6.4, 9.15);
+    Cube[14].size = vec3(2.5, 6.4, 2.5);
+    Cube[14].materialID = 15;
+    
+    // Third Leg
+    Cube[15].center = vec3(-18.15, -6.4, -9.15);
+    Cube[15].size = vec3(2.5, 6.4, 2.5);
+    Cube[15].materialID = 15;
+    
+    // Fourth Leg
+    Cube[16].center = vec3(18.15, -6.4, -9.15);
+    Cube[16].size = vec3(2.5, 6.4, 2.5);
+    Cube[16].materialID = 15;
 }
 
 void InitLight() {
     // Light 0
-    Light[0].position = vec3(0, 5, 0);
-    Light[0].E = vec3(1, 1, 1) * vec3(300);
+    Light[0].position = vec3(9.0 * cos(iTime), 15.0, 9.0 * sin(iTime));
+    Light[0].E = vec3(1, 1, 1) * vec3(1500);
     
     // Light 1
-    Light[1].position = vec3(0, 100, 0);
-    Light[1].E = vec3(1, 1, 1) * vec3(50000);
+    Light[1].position = vec3(-29.0, 12.0, 19.0);
+    Light[1].E = vec3(1, 1, 1) * vec3(2000);
     // Light 2
-    Light[2].position = vec3(-15, 5, 0);
-    Light[2].E = vec3(1, 1, 1) * vec3(300);
+    Light[2].position = vec3(-29.0, 12.0, 19.0);
+    Light[2].E = vec3(1, 1, 1) * vec3(2000);
 
 
 }
@@ -305,48 +358,48 @@ void InitMaterial() {
     
     // Black Plastic Material
     Material[0].albedo = vec3(0, 0, 0);
-    Material[0].roughness = 0.8;
-    Material[0].metalness = 0.2;
+    Material[0].roughness = 0.5;
+    Material[0].metalness = 0.6;
     Material[0].emission = vec3(0.0);
     // Red Plastic Material
-    Material[1].albedo = vec3(0.89, 0.09, 0.05);
-    Material[1].roughness = 0.8;
-    Material[1].metalness = 0.2;
+    Material[1].albedo = vec3(0.95, 0.09, 0.05);
+    Material[1].roughness = 0.5;
+    Material[1].metalness = 0.6;
     Material[1].emission = vec3(0.0);
     // Purple Plastic Material
     Material[2].albedo = vec3(0.86, 0.44, 0.84);
-    Material[2].roughness = 0.8;
-    Material[2].metalness = 0.2;
+    Material[2].roughness = 0.5;
+    Material[2].metalness = 0.6;
     Material[2].emission = vec3(0.0);
     // Blue Plastic Material
     Material[3].albedo = vec3(0.0, 0.0, 1.0);
-    Material[3].roughness = 0.8;
-    Material[3].metalness = 0.2;
+    Material[3].roughness = 0.5;
+    Material[3].metalness = 0.6;
     Material[3].emission = vec3(0.0);
     // Green Plastic Material
     Material[4].albedo = vec3(0.13, 0.55, 0.13);
-    Material[4].roughness = 0.8;
-    Material[4].metalness = 0.2;
+    Material[4].roughness = 0.5;
+    Material[4].metalness = 0.6;
     Material[4].emission = vec3(0.0);
     // Brown Plastic Material
     Material[5].albedo = vec3(0.78, 0.38, 0.08);
-    Material[5].roughness = 0.8;
-    Material[5].metalness = 0.2;
+    Material[5].roughness = 0.5;
+    Material[5].metalness = 0.6;
     Material[5].emission = vec3(0.0);
     // Yellow Plastic Material
     Material[6].albedo = vec3(1.0, 1.0, 0.0);
-    Material[6].roughness = 0.8;
-    Material[6].metalness = 0.2;
+    Material[6].roughness = 0.5;
+    Material[6].metalness = 0.6;
     Material[6].emission = vec3(0.0);
     // White Plastic Material
     Material[7].albedo = vec3(1.0, 1.0, 1.0);
-    Material[7].roughness = 0.8;
-    Material[7].metalness = 0.2;
+    Material[7].roughness = 0.5;
+    Material[7].metalness = 0.6;
     Material[7].emission = vec3(0.0);
     // Table Material
     Material[8].albedo = vec3(0.02, 0.36, 0.04);
-    Material[8].roughness = 0.8;
-    Material[8].metalness = 0.5;
+    Material[8].roughness = 0.7;
+    Material[8].metalness = 0.2;
     Material[8].emission = vec3(0.0);
     // Baffle Material
     Material[9].albedo = vec3(0.2, 0.05, 0.04);
@@ -363,8 +416,28 @@ void InitMaterial() {
     Material[11].roughness = 0.8;
     Material[11].metalness = 0.2;
     Material[11].emission = vec3(0.4);
+    // Hole Material
+    Material[13].albedo = vec3(0.02, 0.02, 0.02);
+    Material[13].roughness = 1.0;
+    Material[13].metalness = 0.0;
+    Material[13].emission = vec3(0.0);
+    // Second Plane Material
+    Material[14].albedo = vec3(0.95, 0.90, 0.2);
+    Material[14].roughness = 0.5;
+    Material[14].metalness = 0.6;
+    Material[14].emission = vec3(0.0);
+    // Leg Material
+    Material[15].albedo = vec3(0.46, 0.63, 0.69);
+    Material[15].roughness = 0.5;
+    Material[15].metalness = 0.5;
+    Material[15].emission = vec3(0.0);
+
+}
+
+void getFloorMaterial(vec2 xz) {
     // Floor Material
-    vec2 uv = 6.*gl_FragCoord.xy / iResolution.xy / s;
+    xz = vec2((xz.x+30.0)/60.0, (xz.y+25.0)/50.0);
+    vec2 uv = 20.* xz / s;
     vec4 h1 = getHex(uv);
     vec4 h2 = getHex(uv - 1./s);
     vec4 h3 = getHex(uv + 1./s);
@@ -721,22 +794,68 @@ Hit IntersectScene(Ray_t ray) {
                       }
     }
     if(nearest_hitMatID==10 && IntersectNUS(nearest_hitPos.zy))nearest_hitMatID = 11;
+    if(nearest_hitMatID==12) getFloorMaterial(nearest_hitPos.xz);
     return Hit(hasHitSomething, nearest_hitPos, nearest_hitNormal, nearest_hitMatID);
+}
+//---Random------------------------------------------------------
+float random (vec2 st) {
+    return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);
+}
+
+float randomInt(float seed) {
+    vec2 temp = vec2(seed, 0.0);
+    float rand = random(temp);
+    rand = rand * 6.0; 
+    rand = ceil(rand);
+    return rand;
+}
+
+vec3 mapHolePos(in float num) {
+    if (num == 1.0) {
+        return vec3(18.0, 0.5, -9.0);
+    }else if(num == 2.0) {
+        return vec3(18.0, 0.5, 9.0);
+    }else if(num == 3.0) {
+        return vec3(0.0, 0.5, -9.0);
+    }else if(num == 4.0) {
+        return vec3(0.0, 0.5, 9.0);
+    }else if(num == 5.0) {
+        return vec3(-18.0, 0.5, -9.0);
+    }else if(num == 6.0) {
+        return vec3(-18.0, 0.5, 9.0);
+    }
+}
+
+vec3 mapWhiteBall(in float num) {
+    if (num == 1.0) {
+        return vec3(-5.0, 0.5, 4.0);
+    }else if(num == 2.0) {
+        return vec3(-5.0, 0.5, -4.0);
+    }else if(num == 3.0) {
+        return vec3(15.0, 0.5, 6.0);
+    }else if(num == 4.0) {
+        return vec3(15.0, 0.5, -6.0);
+    }else if(num == 5.0) {
+        return vec3(15.0, 0.5, 2.0);
+    }else if(num == 6.0) {
+        return vec3(15.0, 0.5, -2.0);
+    }
 }
 
 //----------------------------------------------------------------------
 
 //---Movement-----------------------------------------------------------
-void CalcMove(in int sph) {
-    vec3 holePos = vec3(18.0, 0.5, -9.0);
+void CalcMove(in int sph, in float rand) {
+    vec3 holePos = mapHolePos(rand);
+    Sphere[21].center = mapWhiteBall(rand);
     vec3 centerPos = Sphere[sph].center;
     vec3 TargetMove = holePos - centerPos;
-    float TargetMovex = abs(TargetMove.x);
-    float TargetMovez = abs(TargetMove.z);
+    float TargetMovex = TargetMove.x;
+    float TargetMovez = TargetMove.z;
     float TargetMoveLength = sqrt(TargetMovex * TargetMovex + TargetMovez * TargetMovez);
     float S = TargetMovez / TargetMoveLength;
     float C = TargetMovex / TargetMoveLength;
-    vec3 arrivePos = vec3(centerPos.x - 1.0 * C, 0.5, centerPos.z + 1.0 * S);
+    vec3 arrivePos = vec3(centerPos.x - 1.0 * C, 0.5, centerPos.z - 1.0 * S);
     vec3 HitMove = arrivePos - Sphere[21].center;
     float HitMovex = abs(HitMove.x);
     float HitMovez = abs(HitMove.z);
@@ -746,6 +865,7 @@ void CalcMove(in int sph) {
     float T = 3.0;
     float t = mod(iTime, T);
     float Speed = (HitMoveLength + 2.0 * TargetMoveLength) / T;
+    float DownSpeed = 1.0 / 0.15;
     float t1 = HitMoveLength / Speed;
     float xDir = 1.0;
     if (Sphere[sph].center.x < Sphere[21].center.x) {
@@ -764,27 +884,30 @@ void CalcMove(in int sph) {
         Sphere[21].center = arrivePos;
         float delta = t - t1;
         Sphere[sph].center.x += Speed * 0.5 * delta * C;
-        Sphere[sph].center.z -= Speed * 0.5 * delta * S;
+        Sphere[sph].center.z += Speed * 0.5 * delta * S;
+        if (t >= 2.8) {
+            float downDelta = t - 2.85;
+            Sphere[sph].center.y -= DownSpeed * downDelta;
+        }
         vec3 dir = HitMove - 0.5 * TargetMove;
         float dirLength = sqrt(dir.x * dir.x + dir.z * dir.z);
         float ss = dir.z / dirLength;
         float cc = dir.x / dirLength;
-        Sphere[21].center.x += Speed * 0.15 * delta * cc;
-        Sphere[21].center.z += Speed * 0.15 * delta * ss;
+        Sphere[21].center.x += Speed * 0.13 * delta * cc;
+        Sphere[21].center.z += Speed * 0.13 * delta * ss;
     }
 }
 
-void Movement() {
+int Movement() {
     float T = 3.0;
     int turn = int(mod(iTime / T, 4.0));
-    CalcMove(17 + turn);
+    float t = floor((iTime + 3.0) / T);
+    float rand = randomInt(t);
+    
+    CalcMove(17 + turn, rand);
+    return 17 + turn;
 }
 //----------------------------------------------------------------------
-
-bool rayOutScene(vec3 pos){
-    //return pos.z < -5.0; // Change it!
-    return false;
-}
 
 vec3 Whitted_Raytracing() {
     // Scale pixel 2D position such that its y coordinate is in [-1.0, 1.0].
@@ -800,7 +923,7 @@ vec3 Whitted_Raytracing() {
 
     while (true) {
         Hit hit = IntersectScene(pRay);
-        if(!hit.hit || rayOutScene(hit.position))break;
+        if(!hit.hit)break;
         Material_t m = Material[hit.MaterialID];
         vec3 n = hit.normal;
         vec3 p = hit.position + hit.normal * EPSILON;
@@ -843,10 +966,12 @@ vec3 Whitted_Raytracing() {
 }
 
 
-void SetCamera() {
+void SetCamera(in int num) {
+    
     // Position the camera.
-    camera.pos = vec3( Sphere[21].center.x - 20.0, 10.0, Sphere[21].center.z + 15.0 );
-    camera.lookat = Sphere[21].center;
+    vec3 OriginPos = vec3(-4.0, 0.5, 6.0);
+    camera.pos = vec3( OriginPos.x + (Sphere[21].center.x - OriginPos.x) * 0.6 - 23.0, 12.5, OriginPos.z + (Sphere[21].center.z - OriginPos.z) * 0.6 + 15.0 );
+    camera.lookat = Sphere[num].center;
     vec3 cam_up_vec = vec3(0.0, 1.0, 0.0);
 
     // Set up camera coordinate frame in world space.
@@ -858,8 +983,8 @@ void SetCamera() {
 void mainImage( out vec4 fragColor, in vec2 fragCoord)
 {
     InitScene();
-    Movement();
-    SetCamera();
+    int ballNo = Movement();
+    SetCamera(ballNo);
     vec3 result = Whitted_Raytracing();
     fragColor = vec4(ltos3(result.x, result.y, result.z), 1.0); // Gamma correct
 }
